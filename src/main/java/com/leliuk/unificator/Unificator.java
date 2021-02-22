@@ -10,6 +10,9 @@ public interface Unificator<L, R> {
     Try<List<Substitution<?>>> unify(L left, R right);
 
     static <L, R> Unificator<R, L> reversed(Unificator<L, R> toReverse) {
+        if (toReverse == null) {
+            return null;
+        }
         return (l, r) -> toReverse.unify(r, l);
     }
 }

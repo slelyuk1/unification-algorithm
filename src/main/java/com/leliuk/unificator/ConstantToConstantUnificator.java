@@ -15,7 +15,7 @@ public class ConstantToConstantUnificator implements Unificator<UConstant, UCons
             if (left.getValue().equals(right.getValue())) {
                 return Collections.emptyList();
             }
-            throw new UnificationException(left, right);
+            throw new UnificationException(left, right, "constants have different values");
         });
     }
 }

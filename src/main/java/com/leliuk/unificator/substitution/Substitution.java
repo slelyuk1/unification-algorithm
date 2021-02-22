@@ -7,4 +7,9 @@ import lombok.Value;
 public class Substitution<T> {
     UVariable variable;
     T to;
+
+    @Override
+    public String toString() {
+        return String.format("from %s to %s", variable, to);
+    }
 }

@@ -1,6 +1,5 @@
 package com.leliuk.unificator.searcher;
 
-import com.leliuk.unificator.searcher.UnificatorSearcher;
 import com.leliuk.unificator.Unificator;
 import javafx.util.Pair;
 
@@ -23,10 +22,15 @@ public class MapUnificatorSearcher implements UnificatorSearcher {
 
     @Override
     public <L, R> Optional<Unificator<L, R>> searchUnificator(Class<L> leftType, Class<R> rightType) {
-        Unificator<?, ?> result = unificators.get(new Pair<>(leftType, rightType));
+        Unificator<L, R> result = getUnificator(leftType, rightType);
         if (result == null) {
-            result = Unificator.reversed(unificators.get(new Pair<>(rightType, leftType)));
+            result = Unificator.reversed(getUnificator(rightType, leftType));
         }
-        return Optional.ofNullable((Unificator<L, R>) result);
+        return Optional.ofNullable(result);
+    }
+
+    @SuppressWarnings({"SuspiciousMethodCalls", "unchecked"})
+    private <L, R> Unificator<L, R> getUnificator(Class<L> leftType, Class<R> rightType) {
+        return (Unificator<L, R>) unificators.get(new Pair<>(leftType, rightType));
     }
 }
