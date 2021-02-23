@@ -104,6 +104,114 @@ public class UnificationTest {
         assertEquals(expected, substitutions);
     }
 
+    @Test
+    @DisplayName("e1 = f(a); e2 = g(a); result = failure")
+    void testUnificationExample7() {
+        UFunction e1 = new UFunction("f", Collections.singletonList(new UConstant("a")));
+        UFunction e2 = new UFunction("g", Collections.singletonList(new UConstant("a")));
+        Throwable e = Assertions.assertThrows(UnificationException.class, () -> {
+            searcher.searchUnificator(UFunction.class, UFunction.class)
+                    .map(unificator -> unificator.unify(e1, e2))
+                    .orElseThrow(() -> new IllegalStateException("Couldn't find registered unificator!"))
+                    .get();
+        });
+        System.out.println(e.getMessage());
+    }
+
+    @Test
+    @DisplayName("e1 = f(X); e2 = f(Y); result = {X to Y}")
+    void testUnificationExample8() {
+        UFunction e1 = new UFunction("f", Collections.singletonList(new UVariable("X")));
+        UFunction e2 = new UFunction("f", Collections.singletonList(new UVariable("Y")));
+        List<Substitution<?>> substitutions = searcher.searchUnificator(UFunction.class, UFunction.class)
+                .map(unificator -> unificator.unify(e1, e2))
+                .orElseThrow(() -> new IllegalStateException("Couldn't find registered unificator!"))
+                .get();
+        List<Substitution<?>> expected = Collections.singletonList(new Substitution<>(new UVariable("X"), new UVariable("Y")));
+        assertEquals(expected, substitutions);
+    }
+
+    @Test
+    @DisplayName("e1 = f(X); e2 = g(Y); result = failure")
+    void testUnificationExample9() {
+        UFunction e1 = new UFunction("f", Collections.singletonList(new UVariable("X")));
+        UFunction e2 = new UFunction("g", Collections.singletonList(new UVariable("Y")));
+        Throwable e = Assertions.assertThrows(UnificationException.class, () -> {
+            searcher.searchUnificator(UFunction.class, UFunction.class)
+                    .map(unificator -> unificator.unify(e1, e2))
+                    .orElseThrow(() -> new IllegalStateException("Couldn't find registered unificator!"))
+                    .get();
+        });
+        System.out.println(e.getMessage());
+    }
+
+    @Test
+    @DisplayName("e1 = f(X); e2 = f(Y, Z); result = failure")
+    void testUnificationExample10() {
+        UFunction e1 = new UFunction("f", Collections.singletonList(new UVariable("X")));
+        UFunction e2 = new UFunction("f", Arrays.asList(new UVariable("Y"), new UVariable("Z")));
+        Throwable e = Assertions.assertThrows(UnificationException.class, () -> {
+            searcher.searchUnificator(UFunction.class, UFunction.class)
+                    .map(unificator -> unificator.unify(e1, e2))
+                    .orElseThrow(() -> new IllegalStateException("Couldn't find registered unificator!"))
+                    .get();
+        });
+        System.out.println(e.getMessage());
+    }
+
+    @Test
+    @DisplayName("e1 = f(g(X)); e2 = f(Y); result = {Y to g(X)}")
+    void testUnificationExample11() {
+        UFunction e1 = new UFunction("f", Collections.singletonList(
+                new UFunction("g", Collections.singletonList(
+                        new UVariable("X")))
+        ));
+        UFunction e2 = new UFunction("f", Collections.singletonList(new UVariable("Y")));
+        List<Substitution<?>> substitutions = searcher.searchUnificator(UFunction.class, UFunction.class)
+                .map(unificator -> unificator.unify(e1, e2))
+                .orElseThrow(() -> new IllegalStateException("Couldn't find registered unificator!"))
+                .get();
+        List<Substitution<?>> expected = Collections.singletonList(
+                new Substitution<>(new UVariable("Y"), new UFunction("g", Collections.singletonList(new UVariable("X")))));
+        assertEquals(expected, substitutions);
+    }
+
+    @Test
+    @DisplayName("e1 = f(g(X), X); e2 = f(Y, a); result = [Y to g(X), X to a]")
+    void testUnificationExample12() {
+        UFunction e1 = new UFunction("f", Arrays.asList(
+                new UFunction("g", Collections.singletonList(new UVariable("X"))),
+                new UVariable("X")
+        ));
+        UFunction e2 = new UFunction("f", Arrays.asList(
+                new UVariable("Y"), new UConstant("a")
+        ));
+        List<Substitution<?>> substitutions = searcher.searchUnificator(UFunction.class, UFunction.class)
+                .map(unificator -> unificator.unify(e1, e2))
+                .orElseThrow(() -> new IllegalStateException("Couldn't find registered unificator!"))
+                .get();
+        List<Substitution<?>> expected = Arrays.asList(
+                new Substitution<>(new UVariable("Y"), new UFunction("g", Collections.singletonList(new UVariable("X")))),
+                new Substitution<>(new UVariable("X"), new UConstant("a"))
+        );
+        assertEquals(expected, substitutions);
+    }
+
+    @Test
+    @DisplayName("e1 = X; e2 = f(X); result = failure")
+    void testUnificationExample13() {
+        UVariable e1 = new UVariable("X");
+        UFunction e2 = new UFunction("f", Collections.singletonList(new UVariable("X")));
+        Throwable e = Assertions.assertThrows(UnificationException.class, () -> {
+            searcher.searchUnificator(UVariable.class, UFunction.class)
+                    .map(unificator -> unificator.unify(e1, e2))
+                    .orElseThrow(() -> new IllegalStateException("Couldn't find registered unificator!"))
+                    .get();
+        });
+        System.out.println(e.getMessage());
+    }
+
+
     private static void populateSearcherWithUnificators(UnificatorSearcher searcher) {
         searcher.addUnificator(UConstant.class, UConstant.class, new ConstantToConstantUnificator());
         searcher.addUnificator(UConstant.class, UVariable.class, new ConstantToVariableUnificator());

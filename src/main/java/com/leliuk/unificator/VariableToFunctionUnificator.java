@@ -14,7 +14,7 @@ public class VariableToFunctionUnificator implements Unificator<UVariable, UFunc
     @Override
     public Try<List<Substitution<?>>> unify(UVariable left, UFunction right) {
         if (containsVariable(left, right)) {
-            return Try.failure(new UnificationException(left, right));
+            return Try.failure(new UnificationException(left, right, "function contains the same variable"));
         }
         return Try.success(Collections.singletonList(new Substitution<>(left, right)));
     }
