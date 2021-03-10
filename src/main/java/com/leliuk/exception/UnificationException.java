@@ -1,4 +1,4 @@
-package com.leliuk.unificator.exception;
+package com.leliuk.exception;
 
 public class UnificationException extends RuntimeException {
     private static final String MESSAGE = "Couldn't unify from %s to %s";

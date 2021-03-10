@@ -1,10 +1,10 @@
 package com.leliuk.unificator;
 
-import com.leliuk.unificator.substitution.Substitution;
-import com.leliuk.unificator.exception.UnificationException;
-import com.leliuk.unificator.searcher.UnificatorSearcher;
+import com.leliuk.exception.UnificationException;
 import com.leliuk.term.UFunction;
 import com.leliuk.term.UVariable;
+import com.leliuk.unificator.searcher.UnificatorSearcher;
+import com.leliuk.unificator.substitution.Substitution;
 import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 

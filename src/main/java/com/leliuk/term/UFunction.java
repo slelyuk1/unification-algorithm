@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 @Value
 public class UFunction {
     String name;
-    List<?> terms;
+    List<Object> terms;
 
     public UFunction(String name, List<?> terms) {
         this.name = name;

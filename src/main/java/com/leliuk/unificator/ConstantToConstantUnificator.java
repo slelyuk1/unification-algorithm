@@ -1,8 +1,8 @@
 package com.leliuk.unificator;
 
-import com.leliuk.unificator.substitution.Substitution;
-import com.leliuk.unificator.exception.UnificationException;
+import com.leliuk.exception.UnificationException;
 import com.leliuk.term.UConstant;
+import com.leliuk.unificator.substitution.Substitution;
 import io.vavr.control.Try;
 
 import java.util.Collections;
