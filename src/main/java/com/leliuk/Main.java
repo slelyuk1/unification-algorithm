@@ -7,12 +7,16 @@ import com.leliuk.unificator.*;
 import com.leliuk.unificator.searcher.MapUnificatorSearcher;
 import com.leliuk.unificator.searcher.UnificatorSearcher;
 import com.leliuk.unificator.substitution.Substitution;
+import io.vavr.collection.Stream;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Main {
+
     public static void main(String[] args) {
         UnificatorSearcher searcher = new MapUnificatorSearcher();
         searcher.addUnificator(UConstant.class, UConstant.class, new ConstantToConstantUnificator());
@@ -24,21 +28,53 @@ public class Main {
 
         searcher.addUnificator(UFunction.class, UFunction.class, new FunctionToFunctionUnificator(searcher));
 
-        UFunction e1 = new UFunction("p", Arrays.asList(
-                new UFunction("f", Collections.singletonList(new UConstant("a"))),
-                new UFunction("g", Collections.singletonList(new UConstant("b"))),
-                new UVariable("Y")
-        ));
+        int n = 2;
+        List<Object> arguments1 = new ArrayList<>(
+                Stream.range(1, n + 1)
+                        .map(i -> new UVariable("X" + i))
+                        .collect(Collectors.toList())
+        );
+        arguments1.addAll(
+                Stream.range(0, n)
+                        .map(i -> new UFunction("f", Arrays.asList(new UVariable("Y" + i), new UVariable("Y" + i))))
+                        .collect(Collectors.toList())
+        );
+        arguments1.add(new UVariable("Y" + n));
+        UFunction hTerm1 = new UFunction("h", arguments1);
 
-        UFunction e2 = new UFunction("p", Arrays.asList(
-                new UVariable("Z"),
-                new UFunction("g", Collections.singletonList(new UVariable("W"))),
-                new UConstant("c")
-        ));
+        List<Object> arguments2 = new ArrayList<>(
+                Stream.range(0, n)
+                        .map(i -> new UFunction("f", Arrays.asList(new UVariable("X" + i), new UVariable("X" + i))))
+                        .collect(Collectors.toList())
+        );
+        arguments2.addAll(
+                Stream.range(1, n + 1)
+                        .map(i -> new UVariable("Y" + i))
+                        .collect(Collectors.toList())
+        );
+        arguments2.add(new UVariable("X" + n));
+        UFunction hTerm2 = new UFunction("h", arguments2);
+
+        System.out.println("To unify:");
+        System.out.println(hTerm1);
+        System.out.println(hTerm2);
+        System.out.println();
 
         Unificator<UFunction, UFunction> unificator = searcher.searchUnificator(UFunction.class, UFunction.class)
                 .orElseThrow(() -> new IllegalStateException("Added unificator cannot be found!"));
-        List<Substitution<?>> substitutions = unificator.unify(e1, e2).get();
-        System.out.println(substitutions);
+
+        long start = System.nanoTime();
+        List<Substitution<?>> substitutions = unificator.unify(hTerm1, hTerm2).get();
+        // 20 = 26.479776 seconds
+        // 21 = 84.200551 seconds
+        double duration = (System.nanoTime() - start) * 1e-9;
+
+        System.out.printf("Finished in %f seconds\n", duration);
+        System.out.println("Unified:");
+        System.out.println(
+                substitutions.stream()
+                        .map(Objects::toString)
+                        .collect(Collectors.joining("\n"))
+        );
     }
 }

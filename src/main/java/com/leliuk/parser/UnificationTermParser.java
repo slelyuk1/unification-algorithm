@@ -36,17 +36,4 @@ public class UnificationTermParser implements Parser<Object> {
         return Optional.ofNullable(tryParse)
                 .orElse(Try.failure(new ParserException(Object.class, toParse)));
     }
-
-    // todo implement testing for parser
-    public static void main(String[] args) {
-        UConstantParser constantParser = new UConstantParser();
-        UVariableParser variableParser = new UVariableParser();
-        UnificationTermParser termParser = new UnificationTermParser(new UFunctionParser(constantParser, variableParser));
-        String toParse = "f(a   , d, A, adfsa, e, E, x, y(a), z(a,b, c) , y())";
-        termParser.parse(toParse)
-                .onSuccess(function -> System.out.println("Successfully parsed: " + function))
-                .onFailure(System.err::println);
-
-    }
-
 }
